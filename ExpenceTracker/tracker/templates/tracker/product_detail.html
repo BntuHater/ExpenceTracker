@@ -1,0 +1,20 @@
+{% extends "tracker/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom border-top mb-4">Product</legend>
+                <p class="mr-2"><b>Product Name:</b> {{ object.product_name }}</p>
+                <p class="mr-2"><b>Purchase Date:</b> {{ object.purchase_date }}</p>
+                <p class="mr-2"><b>Product Price:</b> {{ object.product_price }}</p>
+                <p class="mr-2"><b>Product Category:</b> {{ object.category }}</p>
+            </fieldset>
+            <div class="form-group">
+                <a class="btn btn-outline-info mt-1 mb-1" type="submit" href="{% url 'product-update' object.id %}">Edit</a>
+                <a class="btn btn-outline-danger mt-1 mb-1" type="submit" href="{% url 'product-delete' object.id %}">Delete</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

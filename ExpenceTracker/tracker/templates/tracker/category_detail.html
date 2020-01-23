@@ -1,0 +1,17 @@
+{% extends "tracker/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom border-top mb-4">Category</legend>
+                <p class="mr-2"><b>Category Type:</b>  {{ object.category_type }}</p>
+            </fieldset>
+            <div class="form-group">
+                <a class="btn btn-outline-info mt-1 mb-1" type="submit" href="{% url 'category-update' object.id %}">Edit</a>
+                <a class="btn btn-outline-danger mt-1 mb-1" type="submit" href="{% url 'category-delete' object.id %}">Delete</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

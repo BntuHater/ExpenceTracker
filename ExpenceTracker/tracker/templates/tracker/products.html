@@ -1,0 +1,16 @@
+{% extends "tracker/base.html" %}
+{% block content %}
+  <a class="btn btn-outline-info mb-3 ml-4" href="{% url 'product-create' %}">Add new product</a>
+  {% for product in products %}
+    {% if product.user_id == user.id %}
+      <article class="media content-section">
+        <div class="media-body">
+          <p class="mr-2"><b>Product Name:</b> {{ product.product_name }}</p>
+        </div>
+        <form method="GET" action="{% url 'product-detail' product.id %}">
+          <button class="btn btn-outline-info" type="submit">Details</button>
+        </form>
+      </article>
+    {% endif %}
+  {% endfor %}
+{% endblock content %}

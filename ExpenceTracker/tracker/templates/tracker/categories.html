@@ -1,0 +1,16 @@
+{% extends "tracker/base.html" %}
+{% block content %}
+  <a class="btn btn-outline-info mb-3 ml-4" href="{% url 'category-create' %}">Add new category</a>
+  {% for category in categories %}
+    {% if category.user_id == user.id %}
+      <article class="media content-section">
+        <div class="media-body">
+          <p class="mr-2"><b>Category Type:</b> {{ category.category_type }}</p>
+        </div>
+        <form method="GET" action="{% url 'category-detail' category.id %}">
+          <button class="btn btn-outline-info" type="submit">Details</button>
+        </form>
+      </article>
+    {% endif %}
+  {% endfor %}
+{% endblock content %}
