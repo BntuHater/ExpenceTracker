@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -17,14 +17,108 @@ from django.template.loader import get_template
 # from django.core.mail import EmailMessage
 
 # from .tokens import account_activation_token
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, ProductForm, DateInput, RangedDateInput
 from .models import Category, Product
+from .calculate import calc_all_time_stats, calc_current_month_stats, calc_previous_month_stats, calc_ranged_stats
+
+
+@login_required
+def get_all_time_stats(request):
+    stats_dict = 0
+    total_expences = 1
+    products = Product.objects.filter(user=request.user)
+    all_time_stats = calc_all_time_stats(products)
+    context = {
+        'all_time_stats': all_time_stats[stats_dict],
+        'total': all_time_stats[total_expences],
+    }
+    return render(request, 'tracker/all_time_stats.html', context)
+
+
+@login_required
+def get_current_month_stats(request):
+    stats_dict = 0
+    total_expences = 1
+    products = Product.objects.filter(user=request.user)
+    current_month_stats = calc_current_month_stats(products)
+    context = {
+        'current_month_stats': current_month_stats[stats_dict],
+        'total': current_month_stats[total_expences],
+    }
+    return render(request, 'tracker/current_month_stats.html', context)
+
+
+@login_required
+def get_previous_month_stats(request):
+    stats_dict = 0
+    total_expences = 1
+    products = Product.objects.filter(user=request.user)
+    previous_month_stats = calc_previous_month_stats(products)
+    context = {
+        'previous_month_stats': previous_month_stats[stats_dict],
+        'total': previous_month_stats[total_expences],
+    }
+    return render(request, 'tracker/previous_month_stats.html', context)
+
+
+@login_required
+def get_ranged_stats(request):
+    stats_dict = 0
+    total_expences = 1
+    form = RangedDateInput(request.GET)
+    if form.is_valid():
+        products = Product.objects.filter(user=request.user)
+        start = form.cleaned_data['start']
+        end = form.cleaned_data['end']
+        ranged_stats = calc_ranged_stats(products, start, end)
+        context = {
+            'start': start,
+            'end': end,
+            'ranged_stats': ranged_stats[stats_dict],
+            'total': ranged_stats[total_expences],
+        }
+        return render(request, 'tracker/ranged_stats.html', context)
+    else:
+       range_form = RangedDateInput()
+    return render(request, 'tracker/date_range.html', {'form': range_form})
+
+
+@login_required
+def product_create(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.user = request.user
+            product.save()
+            return redirect('product-detail', pk=product.pk)
+    else:
+        form = ProductForm()
+    return render(request, 'tracker/product_form.html', {'form': form})
+
+
+@login_required
+def product_update(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.user = request.user
+            product.save()
+            return redirect('product-detail', pk=product.pk)
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'tracker/product_form.html', {'form': form})
+
 
 def home(request):
     return render(request, 'tracker/base.html')
 
+
 def about(request):
     return render(request, 'tracker/about.html')
+
 
 def registration(request):
     if request.method == 'POST':
@@ -164,43 +258,6 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
 
     def get_success_url(self):
         return reverse_lazy('/')
-
-
-class ProductCreateView(LoginRequiredMixin, CreateView):
-    model = Product
-    fields = [
-        'product_name',
-        'purchase_date',
-        'product_price',
-        'category',
-    ]
-
-    # To define user for product
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse_lazy('product-detail', kwargs={'pk': self.object.pk})
-
-
-class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Product
-    fields = [
-        'product_name',
-        'purchase_date',
-        'product_price',
-        'category',
-    ]
-
-    def test_func(self):
-        product = self.get_object()
-        if self.request.user == product.user:
-            return True
-        return False
-
-    def get_success_url(self):
-        return reverse_lazy('product-detail', kwargs={'pk': self.object.pk})
 
 
 class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):

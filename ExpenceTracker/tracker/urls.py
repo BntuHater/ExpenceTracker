@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 
 from . import views
 
-
+# app_name = 'tracker' -> namespace for {% url 'tracker:products' %}
 urlpatterns = [
     path('', views.home, name='tracker-home'),
     path('about/', views.about, name='tracker-about'),
@@ -34,10 +34,18 @@ urlpatterns += [
 
 urlpatterns += [
     path('products/', views.ProductListView.as_view(), name='products'),
-    path('products/new/', views.ProductCreateView.as_view(), name='product-create'),
+    path('products/new/', views.product_create, name='product-create'),
     path('products/<int:pk>/', views.ProductDetailView.as_view(), name='product-detail'),
-    path('products/<int:pk>/update/', views.ProductUpdateView.as_view(), name='product-update'),
+    path('products/<int:pk>/update/', views.product_update, name='product-update'),
     path('products/<int:pk>/delete/', views.ProductDeleteView.as_view(), name='product-delete'),
+]
+
+
+urlpatterns += [
+    path('all-time-stats/', views.get_all_time_stats, name='all-time-stats'),
+    path('current-month-stats/', views.get_current_month_stats, name='current-month-stats'),
+    path('previous-month-stats/', views.get_previous_month_stats, name='previous-month-stats'),
+    path('ranged-stats/', views.get_ranged_stats, name='ranged-stats'),
 ]
 
 

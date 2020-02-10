@@ -5,7 +5,7 @@
     {% if product.user_id == user.id %}
       <article class="media content-section">
         <div class="media-body">
-          <p class="mr-2"><b>Product Name:</b> {{ product.product_name }}</p>
+          <p class="mr-2">{{ product.category }} : <b>{{ product.product_name }}</b> : {{ product.purchase_date }}</p>
         </div>
         <form method="GET" action="{% url 'product-detail' product.id %}">
           <button class="btn btn-outline-info" type="submit">Details</button>

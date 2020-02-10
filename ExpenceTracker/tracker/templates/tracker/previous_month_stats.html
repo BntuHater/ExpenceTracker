@@ -1,0 +1,35 @@
+{% extends "tracker/base.html" %}
+{% block content %}
+    <form method="GET" action="{% url 'all-time-stats' %}">
+        <button class="btn btn-outline-info" type="submit">All time stats</button>
+    </form>
+    <form class="mt-2" method="GET" action="{% url 'current-month-stats' %}">
+        <button class="btn btn-outline-info" type="submit">Current month stats</button>
+    </form>
+    <form class="mt-2" method="GET" action="{% url 'ranged-stats' %}">
+        <button class="btn btn-outline-info" type="submit">Ranged stats</button>
+    </form>
+    <h2 class="mt-3">Previous month statistic</h2>
+    <div class="border-top pt-3">
+        {% if previous_month_stats%}
+            <table border="2">
+                <tr>
+                    <td><font size="14">Category</font></td>
+                    <td><font size="14">Expences</font></td>
+                </tr>
+                {% for category, expences in previous_month_stats.items %}
+                    <tr>
+                        <td>{{ category }}</td>
+                        <td>{{ expences }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td><b>Total</b></td>
+                    <td><b>{{ total }}</b></td>
+                </tr>
+            </table>
+        {% else %}
+            No data for statisic. Please fill the products list.
+        {% endif %}
+    </div>
+{% endblock content %}
